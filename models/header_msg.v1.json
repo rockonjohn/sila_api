@@ -1,0 +1,34 @@
+{
+  "title": "header_msg",
+  "type": "object",
+  "x-examples": {
+    "header_msg example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "header_msg"
+    }
+  },
+  "description": "Used by Endpoints:\n`/check_handle`\n`/request_kyc`\n`/check_kyc`\n ",
+  "properties": {
+    "header": {
+      "$ref": "./Object References/header.v1.json"
+    },
+    "message": {
+      "type": "string",
+      "enum": [
+        "header_msg"
+      ],
+      "description": "This tag specifies the JSON schema object to validate against. For this call, use `header_msg`"
+    }
+  },
+  "required": [
+    "header",
+    "message"
+  ]
+}

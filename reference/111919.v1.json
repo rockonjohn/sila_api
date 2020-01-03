@@ -1,0 +1,173 @@
+{
+  "openapi": "3.0.0",
+  "tags": [],
+  "info": {
+    "title": "Sila API",
+    "version": "1.0",
+    "description": "# Welcome to the Sila API!\n\nSila allows you to build financial applications quickly and easily. Our API endpoints enable:\n\n* **ID verification** compliant with **U.S. Know Your Customer (KYC)** regulations, \n* **Secure account linking** through our partner **Plaid**, \n* **ACH transfers** in the US, and \n* **Smart contract** programming on Ethereum with our ERC-20 stablecoin. \n\nWe will soon be adding support for **card payments**, **business ID verification**, and **international payments**.\n\nBy using us to build financial applications, you can:\n\n- Decrease your go-to-market time (no regulatory headache or flaky bank partnerships),\n- Dramatically decrease your upfront costs,\n- Keep sensitive data off of your servers,\n- Let us handle ACH transactions (send us JSON, not flat files), and\n- Have the option to transfer tokens pegged to the value of $0.01 USD directly on the blockchain.",
+    "contact": {
+      "name": "Sila",
+      "url": "www.silamoney.com",
+      "email": "info@silamoney.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "sandbox.silamoney.com/{version}",
+      "description": "Sila Sandbox Environment"
+    },
+    {
+      "url": "api.silamoney.com/{version}",
+      "description": "Sila Production Environment"
+    }
+  ],
+  "paths": {
+    "/check_handle": {
+      "post": {
+        "summary": "Check Handle",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "`Handle sent in header.user_handle is available.`\nOR\n`Handle sent in header.user_handle is taken.`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The status attribute is a JSON key sent in the response body.",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the header_message"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Plaintext response of result:\n`user.silamoney.eth is available`"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Two possible attributes for a 200 response:\n`SUCCESS` = Handle sent in `header.user_handle is available`\n`FAILURE` = Handle sent in `header.user_handle is taken`",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "message",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Handle sent in header.user_handle is a reserved handle according to our JSON schema. (Or: request body otherwise does not conform to JSON schema.)"
+          },
+          "401": {
+            "description": "Auth signature is absent or derived address does not belong to auth_handle."
+          }
+        },
+        "description": "*Checks if a specific handle is already taken.*\n\nA \"handle\" works like a username in the Sila ecosystem. This endpoint ensures that a potential handle is available for use. If an entity has already been created with that handle, this endpoint will respond with a message that says that the handle is already in use and a `\"status\": \"FAILURE\"` in the JSON response body.",
+        "operationId": "CheckHandle",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "required": true,
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests. "
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/header_msg.v1.json"
+              },
+              "examples": {
+                "check_handle example": {}
+              }
+            }
+          },
+          "description": "In the `header.user_handle` field, put the handle for which you want to check availability. The entry for `header.auth_handle` should have your developer handle.\n\nThe request body format for this endpoint is the [header_msg](#header_msg) JSON object.\n\nAn `authsignature` header is required for this request. (Create this using the keypair associated with the `auth_handle`; see [authentication](#authentication) for help generating this signature.)"
+        }
+      },
+      "parameters": []
+    },
+    "/register": {
+      "post": {
+        "summary": "Register",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Handle successfully added to system with KYC data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the entity_msg"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Plaintext response of result:\n`user.silamoney.eth was successfully registered`"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS"
+                      ],
+                      "description": "Handle successfully added to system with KYC data."
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "message",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body format, handle already in use, or blockchain address already in use."
+          },
+          "401": {
+            "description": "`authsignature` header was absent or incorrect."
+          }
+        },
+        "description": "*Attaches KYC data and specified blockchain address to an assigned handle.*\n\nThis is the endpoint you will use to create a new user and attach information that will be used to verify their identity. This does not start verification of the KYC data; it only adds the data to be verified. See [/request_kyc](#request_kyc) and [/check_kyc](#check_kyc) for verifying KYC status.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests. ",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/entity_msg.v1.json"
+              }
+            }
+          },
+          "description": "At this endpoint, you will need to complete all fields with user information and include a valid Ethereum address (must not be already used in Sila system and not a smart contract). The private key associated with the `crypto_entry.crypto_address` should be used to generate usersignature headers on some subsequent calls.\n\nIn this version of the API, required KYC data includes:\n\n- Full legal name\n- U.S. Social Security Number (SSN)\n- Date of birth\n- A valid street address\n- An email address\n- A phone number\n\nExpect these requirements to change in upcoming versions!\n\nThis endpoint's request body is the [entity_msg](#entity_msg) JSON object.\n\nAn `authsignature` header is required for this request."
+        },
+        "operationId": "Register"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {}
+  }
+}

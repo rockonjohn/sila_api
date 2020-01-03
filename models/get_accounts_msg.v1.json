@@ -1,0 +1,34 @@
+{
+  "title": "get_accounts_msg",
+  "type": "object",
+  "description": "Used by Endpoints:\n`/get_accounts`",
+  "x-examples": {
+    "get_accounts_msg example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "get_accounts_msg"
+    }
+  },
+  "properties": {
+    "id": {
+      "$ref": "./Object References/header.v1.json"
+    },
+    "message": {
+      "type": "string",
+      "description": "This tag specifies the JSON schema object to validate against. For this call, use `get_accounts_msg`",
+      "enum": [
+        "get_accounts_msg"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "message"
+  ]
+}

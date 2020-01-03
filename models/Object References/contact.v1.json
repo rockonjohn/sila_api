@@ -1,0 +1,20 @@
+{
+  "title": "contact",
+  "type": "object",
+  "description": "This is where the verified person's phone number and email address are sent.",
+  "properties": {
+    "contact_alias": {
+      "type": "string",
+      "description": "Any name attached to the email/phone pair. If desired, leave empty, but don't leave out.",
+      "maxLength": 40
+    },
+    "email": {
+      "type": "string",
+      "description": "This is the verified person's email"
+    },
+    "phone": {
+      "description": "This is the verified person's phone number. Please specify area code at a minimum and country code if anywhere but US.",
+      "type": "string"
+    }
+  }
+}

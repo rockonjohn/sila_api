@@ -1,0 +1,25 @@
+{
+  "title": "crypto_entry",
+  "type": "object",
+  "description": "Used to specify the blockchain address and network code it runs on.",
+  "properties": {
+    "crypto_alias": {
+      "type": "string",
+      "description": "A name to identify the address/code pairing. Can be left blank.",
+      "maxLength": 40
+    },
+    "crypto_code": {
+      "type": "string",
+      "description": "Code to identify network address is on. (As of writing, the only acceptable value is ETH.)"
+    },
+    "crypto_address": {
+      "type": "string",
+      "description": "Hex-encoded blockchain address (prefixed with \"0x\").",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    }
+  },
+  "required": [
+    "crypto_code",
+    "crypto_address"
+  ]
+}

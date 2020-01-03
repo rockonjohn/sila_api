@@ -1,0 +1,47 @@
+{
+  "title": "redeem_msg",
+  "type": "object",
+  "properties": {
+    "header": {
+      "$ref": "./Object References/header.v1.json"
+    },
+    "message": {
+      "type": "string",
+      "enum": [
+        "redeem_msg"
+      ],
+      "description": "\tThis tag specifies the JSON schema object to validate against. For this call, use `redeem_msg`"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount of Sila to burn; amount/100 is credited to user handle's specified account.",
+      "pattern": "^[0-9]{1,25}(?:.[0-9]{0,18})?$"
+    },
+    "account_name": {
+      "type": "string",
+      "description": "Name of user's linked account to be credited."
+    }
+  },
+  "required": [
+    "header",
+    "message",
+    "amount",
+    "account_name"
+  ],
+  "x-examples": {
+    "redeem_msg_example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "redeem_msg",
+      "amount": 1000,
+      "account_name": "default"
+    }
+  },
+  "description": "Used by Endpoints:\n`redeem_sila`"
+}

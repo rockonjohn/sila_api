@@ -1,0 +1,41 @@
+{
+  "title": "entity",
+  "type": "object",
+  "description": "Includes names, birthdates, and user type.",
+  "properties": {
+    "birthdate": {
+      "type": "string",
+      "description": "Date of birth/inception. Must be formatted YYYY-MM-DD.",
+      "format": "date"
+    },
+    "entity_name": {
+      "type": "string",
+      "description": "Full name of entity. This field is used because some names are \"Last First\" rather than the \"First Last\" format usually expected in the US; also allows inclusion of any middle names, titles, etc.",
+      "minLength": 3,
+      "maxLength": 40
+    },
+    "first_name": {
+      "type": "string",
+      "description": "First name of entity.",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Last name of entity.",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "relationship": {
+      "type": "string",
+      "description": "This is the entity type. Specify user in this field to manage the entity as a user."
+    }
+  },
+  "required": [
+    "birthdate",
+    "entity_name",
+    "first_name",
+    "last_name",
+    "relationship"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "title": "identity",
+  "type": "object",
+  "description": "This is used to specify an ID and what kind of ID is being specified. (As of writing, Sila only accepts U.S. Social Security Numbers, but this will expand in the future.)",
+  "properties": {
+    "identity_alias": {
+      "type": "string",
+      "description": "This describes what kind of ID is being sent. (As of writing, the only accepted value is SSN.)",
+      "enum": [
+        "SSN",
+        "EIN",
+        "ITIN"
+      ]
+    },
+    "identity_value": {
+      "type": "string",
+      "description": "This is where the ID value would go."
+    }
+  },
+  "required": [
+    "identity_alias",
+    "identity_value"
+  ]
+}

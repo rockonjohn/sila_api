@@ -1,0 +1,47 @@
+{
+  "title": "issue_msg",
+  "type": "object",
+  "description": "Used by Endpoints:\n`/issue_sila`",
+  "x-examples": {
+    "issue_msg example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "issue_msg",
+      "amount": 1000,
+      "account_name": "default"
+    }
+  },
+  "properties": {
+    "id": {
+      "$ref": "./Object References/header.v1.json"
+    },
+    "message": {
+      "type": "string",
+      "description": "This tag specifies the JSON schema object to validate against. For this call, use `issue_msg`",
+      "enum": [
+        "issue_msg"
+      ]
+    },
+    "amount": {
+      "type": "number",
+      "description": "Amount of Sila to issue the handle (debits amount/100 from specified account and issues Sila amount at registered blockchain address).",
+      "pattern": "^([1-9][0-9]{0,2}|1000)$"
+    },
+    "account_name": {
+      "type": "string",
+      "description": "Name of user handle's linked bank account to debit/credit."
+    }
+  },
+  "required": [
+    "id",
+    "message",
+    "amount",
+    "account_name"
+  ]
+}

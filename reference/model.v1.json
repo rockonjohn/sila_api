@@ -1,0 +1,534 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "Sila's Public JSON Request Body Schema (version 0.2.X)",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/header_msg"
+    },
+    {
+      "$ref": "#/definitions/entity_msg"
+    },
+    {
+      "$ref": "#/definitions/link_account_msg"
+    },
+    {
+      "$ref": "#/definitions/get_accounts_msg"
+    },
+    {
+      "$ref": "#/definitions/issue_msg"
+    },
+    {
+      "$ref": "#/definitions/redeem_msg"
+    },
+    {
+      "$ref": "#/definitions/transfer_msg"
+    },
+    {
+      "$ref": "#/definitions/get_transactions_msg"
+    }
+  ],
+  "definitions": {
+    "comment": {
+      "type": "string"
+    },
+    "version": {
+      "enum": [
+        "0.2",
+        "v0.2"
+      ]
+    },
+    "country": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "epoch": {
+      "pattern": "^[0-9]{10,14}$",
+      "type": "number"
+    },
+    "restricted_sila": {
+      "pattern": "^([1-9][0-9]{0,2}|1000)$",
+      "type": "number"
+    },
+    "relationship": {
+      "enum": [
+        "organization",
+        "developer",
+        "user",
+        "vendor"
+      ]
+    },
+    "sila": {
+      "pattern": "^[0-9]{1,25}(?:.[0-9]{0,18})?$",
+      "type": "number"
+    },
+    "first_name": {
+      "minLength": 1,
+      "type": "string",
+      "maxLength": 30
+    },
+    "last_name": {
+      "minLength": 1,
+      "type": "string",
+      "maxLength": 40
+    },
+    "address": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "country": {
+          "$ref": "#/definitions/country"
+        },
+        "city": {
+          "minLength": 2,
+          "type": "string",
+          "maxLength": 40
+        },
+        "address_alias": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "street_address_1": {
+          "minLength": 3,
+          "type": "string",
+          "maxLength": 40
+        },
+        "street_address_2": {
+          "minLength": 3,
+          "type": "string",
+          "maxLength": 40
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 2
+        },
+        "postal_code": {
+          "type": "string",
+          "maxLength": 10
+        }
+      },
+      "required": [
+        "street_address_1",
+        "city",
+        "state",
+        "postal_code",
+        "country"
+      ]
+    },
+    "handle": {
+      "minLength": 1,
+      "pattern": "^([A-Za-z0-9\\.\\-_]+)$",
+      "type": "string",
+      "maxLength": 50
+    },
+    "message": {
+      "enum": [
+        "header_msg",
+        "entity_msg",
+        "link_account_msg",
+        "get_accounts_msg",
+        "get_transactions_msg",
+        "issue_msg",
+        "redeem_msg",
+        "transfer_msg"
+      ]
+    },
+    "sila_status": {
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    },
+    "contact": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "contact_alias": {
+          "maxlength": 40,
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contact_alias"
+      ]
+    },
+    "crypto_entry": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "crypto_alias": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "crypto_status": {
+          "$ref": "#/definitions/sila_status"
+        },
+        "crypto_address": {
+          "pattern": "^0x[a-fA-F0-9]{40}$",
+          "type": "string"
+        },
+        "crypto_code": {
+          "$ref": "#/definitions/comment"
+        }
+      },
+      "required": [
+        "crypto_code",
+        "crypto_address"
+      ]
+    },
+    "header": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "created": {
+          "$ref": "#/definitions/epoch"
+        },
+        "user_handle": {
+          "$ref": "#/definitions/handle"
+        },
+        "auth_handle": {
+          "$ref": "#/definitions/handle"
+        },
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "crypto": {
+          "$ref": "#/definitions/comment"
+        }
+      },
+      "required": [
+        "reference",
+        "auth_handle",
+        "user_handle",
+        "crypto",
+        "version",
+        "created"
+      ]
+    },
+    "entity": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "birthdate": {
+          "format": "date",
+          "type": "string"
+        },
+        "entity_name": {
+          "minLength": 3,
+          "type": "string",
+          "maxLength": 40
+        },
+        "last_name": {
+          "$ref": "#/definitions/last_name"
+        },
+        "entity_status": {
+          "$ref": "#/definitions/sila_status"
+        },
+        "relationship": {
+          "$ref": "#/definitions/relationship"
+        },
+        "first_name": {
+          "$ref": "#/definitions/first_name"
+        }
+      },
+      "required": [
+        "first_name",
+        "last_name"
+      ]
+    },
+    "identity": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "identity_alias": {
+          "enum": [
+            "SSN",
+            "EIN",
+            "ITIN"
+          ]
+        },
+        "identity_value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "identity_alias",
+        "identity_value"
+      ]
+    },
+    "header_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "message": {
+          "enum": [
+            "header_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message"
+      ]
+    },
+    "entity_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "identity": {
+          "$ref": "#/definitions/identity"
+        },
+        "contact": {
+          "$ref": "#/definitions/contact"
+        },
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "crypto_entry": {
+          "$ref": "#/definitions/crypto_entry"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "message": {
+          "enum": [
+            "entity_msg"
+          ]
+        },
+        "entity": {
+          "$ref": "#/definitions/entity"
+        }
+      },
+      "required": [
+        "header",
+        "message",
+        "entity",
+        "address",
+        "contact",
+        "identity",
+        "crypto_entry"
+      ]
+    },
+    "link_account_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "public_token": {
+          "type": "string"
+        },
+        "account_name": {
+          "type": "string"
+        },
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "selected_account_id": {
+          "type": "string"
+        },
+        "message": {
+          "enum": [
+            "link_account_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message",
+        "public_token"
+      ]
+    },
+    "get_transactions_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "search_filters": {
+          "additionalProperties": false,
+          "type": "object",
+          "properties": {
+            "transaction_id": {
+              "type": "string"
+            },
+            "per_page": {
+              "type": "integer"
+            },
+            "transaction_types": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "buy",
+                  "issue_msg",
+                  "redeem",
+                  "redeem_msg",
+                  "transfer",
+                  "transfer_msg"
+                ]
+              }
+            },
+            "max_sila_amount": {
+              "type": "number"
+            },
+            "reference_id": {
+              "type": "string"
+            },
+            "show_timelines": {
+              "type": "boolean"
+            },
+            "sort_ascending": {
+              "type": "boolean"
+            },
+            "end_epoch": {
+              "$ref": "#/definitions/epoch"
+            },
+            "start_epoch": {
+              "$ref": "#/definitions/epoch"
+            },
+            "statuses": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "complete",
+                  "successful",
+                  "failed"
+                ]
+              }
+            },
+            "page": {
+              "type": "integer"
+            },
+            "min_sila_amount": {
+              "type": "number"
+            }
+          }
+        },
+        "message": {
+          "enum": [
+            "get_transactions_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message"
+      ]
+    },
+    "get_accounts_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "message": {
+          "enum": [
+            "get_accounts_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message"
+      ]
+    },
+    "issue_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/restricted_sila"
+        },
+        "account_name": {
+          "type": "string"
+        },
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "message": {
+          "enum": [
+            "issue_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message",
+        "account_name",
+        "amount"
+      ]
+    },
+    "redeem_msg": {
+      "additionalProperties": false,
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/restricted_sila"
+        },
+        "account_name": {
+          "type": "string"
+        },
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "message": {
+          "enum": [
+            "redeem_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message",
+        "account_name",
+        "amount"
+      ]
+    },
+    "transfer_msg": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/sila"
+        },
+        "destination": {
+          "$ref": "#/definitions/comment"
+        },
+        "header": {
+          "$ref": "#/definitions/header"
+        },
+        "message": {
+          "enum": [
+            "transfer_msg"
+          ]
+        }
+      },
+      "required": [
+        "header",
+        "message",
+        "destination",
+        "amount"
+      ]
+    }
+  },
+  "x-examples": {
+    "example-1": {}
+  }
+}

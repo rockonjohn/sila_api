@@ -1,0 +1,54 @@
+{
+  "title": "address",
+  "type": "object",
+  "description": "This object specifies the street address of the person being verified.",
+  "properties": {
+    "address_alias": {
+      "type": "string",
+      "description": "This is a nickname that can be attached to the address object. While a required field, it can be left blank if desired.",
+      "maxLength": 40
+    },
+    "street_address_1": {
+      "type": "string",
+      "description": "This is line 1 of a street address. Post office boxes are not accepted in this field.",
+      "minLength": 3,
+      "maxLength": 40
+    },
+    "street_address_2": {
+      "type": "string",
+      "description": "This is line 2 of a street address (optional). This may include suite or apartment numbers (though, if desired, you can put these in line 1).",
+      "minLength": 3,
+      "maxLength": 40
+    },
+    "city": {
+      "type": "string",
+      "description": "Name of the city where the person being verified is a current resident.",
+      "minLength": 2,
+      "maxLength": 40
+    },
+    "state": {
+      "type": "string",
+      "description": "Name of state where verified person is a current resident. (As of writing, this is a required field as the only accepted country is the US, but this may be expected to change in future versions.)",
+      "minLength": 2,
+      "maxLength": 2
+    },
+    "country": {
+      "type": "string",
+      "description": "Two-letter country code. (As of writing, the only acceptable value is US.)",
+      "minLength": 2,
+      "maxLength": 40
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "In the US, this can be the 5-digit ZIP code or ZIP+4 code.",
+      "maxLength": 10
+    }
+  },
+  "required": [
+    "street_address_1",
+    "city",
+    "state",
+    "country",
+    "postal_code"
+  ]
+}

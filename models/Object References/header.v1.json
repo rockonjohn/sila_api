@@ -1,0 +1,48 @@
+{
+  "title": "header",
+  "type": "object",
+  "properties": {
+    "auth_handle": {
+      "type": "string",
+      "description": "This is the superuser handle used to identify the API consumer making the call.",
+      "minLength": 1,
+      "maxLength": 50,
+      "pattern": "^([A-Za-z0-9\\.\\-_]+)$"
+    },
+    "user_handle": {
+      "type": "string",
+      "description": "This is the user handle attached to the KYC'd entity.\t",
+      "minLength": 1,
+      "maxLength": 50,
+      "pattern": "^([A-Za-z0-9\\.\\-_]+)$"
+    },
+    "created": {
+      "type": "integer",
+      "description": "Epoch time that the API call was started (in nanoseconds).",
+      "pattern": "^[0-9]{10,14}$"
+    },
+    "crypto": {
+      "type": "string",
+      "description": "This tag specifies the blockchain network to use. (As of writing, the only valid crypto tag available is ETH.)"
+    },
+    "reference": {
+      "type": "string",
+      "description": "This is an idempotency string used to identify the call you've made."
+    },
+    "version": {
+      "type": "string",
+      "description": "This tag specifies the version of the API you want to use. (As of writing, the only valid version string to use is 0.2.)",
+      "enum": [
+        "0.2",
+        "v0.2"
+      ]
+    }
+  },
+  "required": [
+    "auth_handle",
+    "user_handle",
+    "created",
+    "version"
+  ],
+  "description": "This object is required in every call. The information it includes is used to verify the signature."
+}

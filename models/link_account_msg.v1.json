@@ -1,0 +1,49 @@
+{
+  "title": "link_account_msg",
+  "type": "object",
+  "description": "Used by Endpoints:\n`/link_account`",
+  "x-examples": {
+    "link_account_msg example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "link_account_msg",
+      "public_token": "public_token_wH473vr",
+      "account_name": "Chase Checking Account"
+    }
+  },
+  "properties": {
+    "header": {
+      "$ref": "./Object References/header.v1.json"
+    },
+    "message": {
+      "type": "string",
+      "description": "This tag specifies the JSON schema object to validate against. For this call, use `link_account_msg`",
+      "enum": [
+        "link_account_msg"
+      ]
+    },
+    "public_token": {
+      "type": "string",
+      "description": "This is the public token returned in the onSuccess function of a Plaid Link session."
+    },
+    "account_name": {
+      "type": "string",
+      "description": "This is the name given to the linked account. If omitted, it is \"default\"."
+    },
+    "selected_account_id": {
+      "type": "string",
+      "description": "If one account is selected through Plaid Link, the ID found in the selected accounts array can be passed in here. If this is omitted, the endpoint will choose the first checking account it finds at the end-user's bank."
+    }
+  },
+  "required": [
+    "header",
+    "message",
+    "public_token"
+  ]
+}

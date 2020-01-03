@@ -1,0 +1,80 @@
+{
+  "title": "search_filters",
+  "type": "object",
+  "description": "This is an optional object with all-optional attributes. The values inside this object filter the results to be returned.",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "description": "The UUID that Sila assigns to a transaction."
+    },
+    "reference_id": {
+      "type": "string",
+      "description": "The reference sent in the message header object when the transaction was first created."
+    },
+    "statuses": {
+      "type": "array",
+      "description": "Possible values in the array include \"pending\", \"complete\", \"successful\", and \"failed\". An empty/absent array results in no filter on transaction status.",
+      "enum": [
+        "pending",
+        "complete",
+        "successful",
+        "failed"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "transaction_types": {
+      "type": "array",
+      "description": "Possible values in the array include \"issue\", \"redeem\", and \"transfer\". An empty/absent array just results in returning all types.",
+      "enum": [
+        "buy",
+        "issue_msg",
+        "redeem",
+        "redeem_msg",
+        "transfer",
+        "transfer_msg"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "max_sila_amount": {
+      "type": "number",
+      "description": "If specified and > 0, returns transactions with amounts less than or equal to this amount."
+    },
+    "min_sila_amount": {
+      "type": "number",
+      "description": "If specified and > 0, returns transactions with amounts greater than or equal to this amount."
+    },
+    "start_epoch": {
+      "type": "number",
+      "description": "Nanosecond epoch time. If specified and is a date after 1969, returns transactions started after this date.",
+      "pattern": "^[0-9]{10,14}$"
+    },
+    "end_epoch": {
+      "type": "number",
+      "description": "Nanosecond epoch time. Returns transactions started before this date.",
+      "pattern": "^[0-9]{10,14}$"
+    },
+    "page": {
+      "type": [
+        "string",
+        "integer"
+      ],
+      "description": "Specifies page of results to return (default 1)."
+    },
+    "per_page": {
+      "type": "integer",
+      "description": "Number of results to return in a single call (1-100, default 20)."
+    },
+    "sort_ascending": {
+      "type": "boolean",
+      "description": "If true, returns the oldest transactions first instead of the newest first."
+    },
+    "show_timelines": {
+      "type": "boolean",
+      "description": "If true, adds a timeline array to each transaction object in the JSON response."
+    }
+  }
+}

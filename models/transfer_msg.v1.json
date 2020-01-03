@@ -1,0 +1,47 @@
+{
+  "title": "transfer_msg",
+  "type": "object",
+  "description": "Used by Endpoints:\n`/transfer_sila`",
+  "x-examples": {
+    "transfer_msg example": {
+      "header": {
+        "created": 1234567890,
+        "auth_handle": "handle.silamoney.eth",
+        "user_handle": "user.silamoney.eth",
+        "version": "0.2",
+        "crypto": "ETH",
+        "reference": "ref"
+      },
+      "message": "transfer_msg",
+      "amount": 13,
+      "destination": "user2.silamoney.eth"
+    }
+  },
+  "properties": {
+    "header": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string",
+      "description": "This tag specifies the JSON schema object to validate against. For this call, use `transfer_msg`",
+      "enum": [
+        "transfer_msg"
+      ]
+    },
+    "destination": {
+      "type": "string",
+      "description": "Handle of recipient of Sila amount."
+    },
+    "amount": {
+      "description": "Amount of Sila to transfer.",
+      "type": "number",
+      "pattern": "^[0-9]{1,25}(?:.[0-9]{0,18})?$"
+    }
+  },
+  "required": [
+    "header",
+    "message",
+    "destination",
+    "amount"
+  ]
+}

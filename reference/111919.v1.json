@@ -217,9 +217,54 @@
               }
             }
           },
-          "description": "Attaches KYC data and specified blockchain address to an assigned handle.\n\nThis is the endpoint you will use to create a new user and attach information that will be used to verify their identity. This does not start verification of the KYC data; it only adds the data to be verified. See /request_kyc and /check_kyc for verifying KYC status.\n\nAt this endpoint, you will need to complete all fields with user information and include a valid Ethereum address (must not be already used in Sila system and not a smart contract). The private key associated with the `crypto_entry.crypto_address` should be used to generate usersignature headers on some subsequent calls.\n\nIn this version of the API, required KYC data includes:\n\n- Full legal name\n- U.S. Social Security Number (SSN)\n- Date of birth\n- A valid street address\n- An email address\n- A phone number\n\nExpect these requirements to change in upcoming versions!\n\nThis endpoint's request body is the [entity_msg](#entity_msg) JSON object.\n\nAn `authsignature` header is required for this request."
+          "description": "At this endpoint, you will need to complete all fields with user information and include a valid Ethereum address (must not be already used in Sila system and not a smart contract). The private key associated with the `crypto_entry.crypto_address` should be used to generate usersignature headers on some subsequent calls.\n\nIn this version of the API, required KYC data includes:\n\n- Full legal name\n- U.S. Social Security Number (SSN)\n- Date of birth\n- A valid street address\n- An email address\n- A phone number\n\nExpect these requirements to change in upcoming versions!\n\nThis endpoint's request body is the [entity_msg](#entity_msg) JSON object.\n\nAn `authsignature` header is required for this request."
         },
         "operationId": "Register"
+      }
+    },
+    "/request_kyc": {
+      "post": {
+        "summary": "Request KYC",
+        "tags": [],
+        "responses": {},
+        "operationId": "post-request_kyc",
+        "description": "After having created a user at a handle with /register, you can start the KYC verification process on the user with this endpoint. The verification results for a handle are asynchronously returned at the /check_kyc endpoint.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "required": true,
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/header_msg.v1.json"
+              },
+              "examples": {
+                "Request KYC": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "header_msg"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the header_msg JSON object.\n\nheader.user_handle should have the registered handle to be verified.\n\nAn authsignature header is required for this request."
+        }
       }
     }
   },

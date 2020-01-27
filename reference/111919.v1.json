@@ -96,7 +96,7 @@
                 "$ref": "../models/header_msg.v1.json"
               },
               "examples": {
-                "check_handle example": {
+                "/check_handle request": {
                   "value": {
                     "header": {
                       "created": 1234567890,
@@ -112,7 +112,7 @@
               }
             }
           },
-          "description": "In the `header.user_handle` field, put the handle for which you want to check availability. The entry for `header.auth_handle` should have your developer handle.\n\nThe request body format for this endpoint is the [header_msg](#header_msg) JSON object.\n\nAn `authsignature` header is required for this request. (Create this using the keypair associated with the `auth_handle`; see [authentication](#authentication) for help generating this signature.)"
+          "description": "In the `header.user_handle` field, put the handle for which you want to check availability. The entry for `header.auth_handle` should have your developer handle.\n\nThe request body format for this endpoint is the [header_msg](#header_msg) JSON object.\n\nAn `authsignature` header is required for this request. "
         }
       },
       "parameters": []
@@ -189,7 +189,7 @@
                 "$ref": "../models/entity_msg.v1.json"
               },
               "examples": {
-                "Post": {
+                "/register request": {
                   "value": {
                     "header": {
                       "reference": "SOME ID",
@@ -303,7 +303,7 @@
                 "$ref": "../models/header_msg.v1.json"
               },
               "examples": {
-                "Request KYC": {
+                "/request_kyc request": {
                   "value": {
                     "header": {
                       "created": 1234567890,
@@ -319,7 +319,85 @@
               }
             }
           },
-          "description": "The request body at this endpoint is the header_msg JSON object.\n\nheader.user_handle should have the registered handle to be verified.\n\nAn authsignature header is required for this request."
+          "description": "The request body at this endpoint is the header_msg JSON object.\n\nheader.user_handle should have the registered handle to be verified.\n\nAn `authsignature` header is required for this request. "
+        }
+      }
+    },
+    "/check_kyc": {
+      "post": {
+        "summary": "Check KYC",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "The user handle has successfully passed KYC verification _OR_  \nThe user handle has not successfully passed KYC verification (may be pending, not have been registered, or have failed; `message` attribute will contain \"pending\" or \"failed\" substring).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The status attribute is a JSON key sent in the response body.",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the header_message"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Plaintext response with result: `KYC passed for user.silamoney.eth`"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ],
+                      "description": "The user handle has not successfully passed KYC verification (may be pending, not have been registered, or have failed; `message` attribute will contain \"pending\" or \"failed\" substring)."
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-check_kyc",
+        "description": "Returns whether entity attached to user handle is verified, not valid, or still pending.\n\nThis endpoint should be run after successfully completing /register and /request_kyc calls.\n\nSince ID verification is a relatively lengthy process (generally will take around 30 minutes to an hour to complete), /request_kyc will never confirm in its response that an entity was verified. Therefore, /check_kyc may be polled until a final confirmation is returned.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/header_msg.v1.json"
+              },
+              "examples": {
+                "/check_kyc request": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "header_msg"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the header_msg JSON object.\n\nThe handle for which KYC confirmation is being checked should be in the header.user_handle field.\n\nBoth `authsignature` and `usersignature` headers are required for this request. (The `usersignature` header should be generated with the keypair associated with the user)"
         }
       }
     }

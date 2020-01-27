@@ -47,8 +47,7 @@
                       "type": "string",
                       "description": "Two possible attributes for a 200 response:\n`SUCCESS` = Handle sent in `header.user_handle is available`\n`FAILURE` = Handle sent in `header.user_handle is taken`",
                       "enum": [
-                        "SUCCESS",
-                        "FAILURE"
+                        "SUCCESS"
                       ]
                     }
                   },
@@ -142,8 +141,7 @@
                       "type": "string",
                       "description": "Handle successfully added to system with KYC data.",
                       "enum": [
-                        "SUCCESS",
-                        "FAILURE"
+                        "SUCCESS"
                       ]
                     }
                   },
@@ -265,10 +263,8 @@
                       "type": "string",
                       "description": "`SUCCESS` or `FAILURE`",
                       "enum": [
-                        "SUCCESS",
-                        "FAILURE"
-                      ],
-                      "example": "SUCCESS"
+                        "SUCCESS"
+                      ]
                     }
                   },
                   "required": [
@@ -279,6 +275,12 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid request body format."
+          },
+          "401": {
+            "description": "authsignature` or `usersignature` header was absent or incorrect."
           }
         },
         "operationId": "post-request_kyc",

@@ -354,8 +354,19 @@
                     }
                   },
                   "required": [
+                    "reference",
+                    "message",
                     "status"
                   ]
+                },
+                "examples": {
+                  "/check_kyc response": {
+                    "value": {
+                      "reference": "ref",
+                      "message": "KYC passed for user.silamoney.eth",
+                      "status": "SUCCESS"
+                    }
+                  }
                 }
               }
             }

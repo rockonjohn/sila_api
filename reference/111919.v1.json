@@ -57,6 +57,15 @@
                     "message",
                     "status"
                   ]
+                },
+                "examples": {
+                  "/check_handle response": {
+                    "value": {
+                      "reference": "ref",
+                      "message": "user.silamoney.eth is available.",
+                      "status": "SUCCESS"
+                    }
+                  }
                 }
               }
             }
@@ -131,10 +140,11 @@
                     },
                     "status": {
                       "type": "string",
+                      "description": "Handle successfully added to system with KYC data.",
                       "enum": [
-                        "SUCCESS"
-                      ],
-                      "description": "Handle successfully added to system with KYC data."
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
                     }
                   },
                   "required": [
@@ -142,6 +152,15 @@
                     "message",
                     "status"
                   ]
+                },
+                "examples": {
+                  "/register response": {
+                    "value": {
+                      "reference": "SOME ID",
+                      "message": "user.silamoney.eth was successfully registered ",
+                      "status": "SUCCESS"
+                    }
+                  }
                 }
               }
             }
@@ -226,7 +245,42 @@
       "post": {
         "summary": "Request KYC",
         "tags": [],
-        "responses": {},
+        "responses": {
+          "200": {
+            "description": "The verification process for the user registered under header.user_handle has been successfully started.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the entity_msg"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Plaintext response of result:\n`user.silamoney.eth submitted for KYC review`"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "`SUCCESS` or `FAILURE`",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ],
+                      "example": "SUCCESS"
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "message",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        },
         "operationId": "post-request_kyc",
         "description": "After having created a user at a handle with /register, you can start the KYC verification process on the user with this endpoint. The verification results for a handle are asynchronously returned at the /check_kyc endpoint.",
         "parameters": [

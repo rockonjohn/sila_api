@@ -411,6 +411,104 @@
           "description": "The request body at this endpoint is the header_msg JSON object.\n\nThe handle for which KYC confirmation is being checked should be in the header.user_handle field.\n\nBoth `authsignature` and `usersignature` headers are required for this request. (The `usersignature` header should be generated with the keypair associated with the user)"
         }
       }
+    },
+    "/link_account": {
+      "post": {
+        "summary": "Link Account",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
+                    },
+                    "reference": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "account_name": {
+                      "type": "string"
+                    },
+                    "match_score": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "reference",
+                    "message",
+                    "account_name",
+                    "match_score"
+                  ]
+                },
+                "examples": {
+                  "/link_account response": {
+                    "value": {
+                      "status": "SUCCESS",
+                      "reference": "ref",
+                      "message": "Bank account successfully linked.",
+                      "account_name": "Custom Account Name",
+                      "match_score": 0.825
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-link_account",
+        "description": "Uses a provided Plaid public token to link a bank account to a verified entity.\n\nThis endpoint accepts results from customer interaction with a Plaid Link integration.\n\nAt a minimum, your frontend Plaid integration will need to:\n* use a public key from Sila. For all environments (sandbox, development and production), please use the same public key:\nfa9dd19eb40982275785b09760ab79\n* be set to the \"sandbox\" environment for sandbox apps, and the \"production\" environment for production apps.\nuse the \"auth\" product from Plaid.\n\nNote: For 100% coverage of all supported institutions, we strongly recommend passing additional parameters when creating the Plaid Link interface to enable microdeposit verification. This configuration is provided in detail in the following sections of this documentation:\n\n* [Plaid Instant Match](https://docs.silamoney.com/?plaintext#instant-auth-and-instant-match)\n* [Plaid Automated Microdeposit Authentication](https://docs.silamoney.com/?plaintext#automated-microdeposit-authentication)\n* [Plaid Same Day Microdeposit Authentication](https://docs.silamoney.com/?plaintext#same-day-microdeposit-authentication)\n\n<h4>Plaid Link Integration Quickstart</h4>\nIn the sandbox, you will be connecting to Plaid's sandbox [Auth product](https://plaid.com/docs/#auth). In the sandbox, you can test with any bank that shows up in the Plaid plugin, and specify the username as `user_good`, and the password as `pass_good`. In production you will need to use real usernames and passwords for bank accounts of course.\n\nThe onSuccess() function of the Plaid plugin will return a public token and metadata object to your code. Please use our API to send us the public token, and we will query the routing number and account number of the bank account from Plaid and store it securely on our systems.\n\nFor an example of how this looks, you can look at Plaid's [documentation](https://plaid.com/docs/#integrating-with-link) and review our demo app.\n\nFor a more detailed dive, see the [Plaid Microdeposits](https://docs.silamoney.com/?plaintext#plaid-microdeposits) section of our documentation.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "name": "authsignature",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/link_account_msg.v1.json"
+              },
+              "examples": {
+                "/link_account example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "link_account_msg",
+                    "public_token": "public-xxx-xxx",
+                    "account_name": "Custom Account Name",
+                    "selected_account_id": "optional_selected_account_id"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the `link_account_msg` JSON object.\n\nThe `public_token` key is a required field and must have the public token returned in the onSuccess function of Plaid Link.\n\nThe `account_name` key is not required, but can be used to set a custom name to identify the linked checking account. If not provided, the linked account's name will be \"default\". We highly recommend specifying a custom name. Note: user handles cannot have two linked accounts with the same name.\n\nThe `selected_account_id` is not required; if provided, it should be an account ID in the array of selected accounts returned in the metadata object from Plaid Link. Currently, we do not link multiple accounts at once; you will need to send only one account ID. If no account ID is provided, we will link the first checking account we encounter from the array of accounts the customer has at their chosen bank.\n\nBoth authsignature and usersignature headers are required for this request."
+        }
+      }
     }
   },
   "components": {

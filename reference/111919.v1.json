@@ -88,7 +88,19 @@
                 "$ref": "../models/header_msg.v1.json"
               },
               "examples": {
-                "check_handle example": {}
+                "check_handle example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "header_msg"
+                  }
+                }
               }
             }
           },
@@ -158,10 +170,54 @@
             "application/json": {
               "schema": {
                 "$ref": "../models/entity_msg.v1.json"
+              },
+              "examples": {
+                "Post": {
+                  "value": {
+                    "header": {
+                      "reference": "SOME ID",
+                      "created": 1234567890,
+                      "user_handle": "user.silamoney.eth",
+                      "auth_handle": "handle.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH"
+                    },
+                    "message": "entity_msg",
+                    "address": {
+                      "address_alias": "home",
+                      "street_address_1": "123 Main Street",
+                      "city": "New City",
+                      "state": "OR",
+                      "country": "US",
+                      "postal_code": "97204-1234"
+                    },
+                    "identity": {
+                      "identity_alias": "SSN",
+                      "identity_value": "123452222"
+                    },
+                    "contact": {
+                      "phone": "503-123-4567",
+                      "contact_alias": "",
+                      "email": "example@silamoney.com"
+                    },
+                    "crypto_entry": {
+                      "crypto_alias": "Address 1",
+                      "crypto_address": "0x1234567890abcdef1234567890abcdef12345678",
+                      "crypto_code": "ETH"
+                    },
+                    "entity": {
+                      "birthdate": "1900-01-31",
+                      "entity_name": "Example User",
+                      "first_name": "Example",
+                      "last_name": "User",
+                      "relationship": "user"
+                    }
+                  }
+                }
               }
             }
           },
-          "description": "At this endpoint, you will need to complete all fields with user information and include a valid Ethereum address (must not be already used in Sila system and not a smart contract). The private key associated with the `crypto_entry.crypto_address` should be used to generate usersignature headers on some subsequent calls.\n\nIn this version of the API, required KYC data includes:\n\n- Full legal name\n- U.S. Social Security Number (SSN)\n- Date of birth\n- A valid street address\n- An email address\n- A phone number\n\nExpect these requirements to change in upcoming versions!\n\nThis endpoint's request body is the [entity_msg](#entity_msg) JSON object.\n\nAn `authsignature` header is required for this request."
+          "description": "Attaches KYC data and specified blockchain address to an assigned handle.\n\nThis is the endpoint you will use to create a new user and attach information that will be used to verify their identity. This does not start verification of the KYC data; it only adds the data to be verified. See /request_kyc and /check_kyc for verifying KYC status.\n\nAt this endpoint, you will need to complete all fields with user information and include a valid Ethereum address (must not be already used in Sila system and not a smart contract). The private key associated with the `crypto_entry.crypto_address` should be used to generate usersignature headers on some subsequent calls.\n\nIn this version of the API, required KYC data includes:\n\n- Full legal name\n- U.S. Social Security Number (SSN)\n- Date of birth\n- A valid street address\n- An email address\n- A phone number\n\nExpect these requirements to change in upcoming versions!\n\nThis endpoint's request body is the [entity_msg](#entity_msg) JSON object.\n\nAn `authsignature` header is required for this request."
         },
         "operationId": "Register"
       }

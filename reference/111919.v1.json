@@ -783,7 +783,7 @@
                   "properties": {
                     "reference": {
                       "type": "string",
-                      "description": "`reference` in the response returns the `reference` provided by the customer in the entity_msg"
+                      "description": "`reference` in the response returns the `reference` provided by the customer"
                     },
                     "message": {
                       "type": "string",
@@ -834,7 +834,8 @@
             },
             "in": "header",
             "name": "usersignature",
-            "description": "The usersignature header should be generated with the keypair associated with the user"
+            "description": "The usersignature header should be generated with the keypair associated with the user",
+            "required": true
           }
         ],
         "requestBody": {
@@ -863,6 +864,90 @@
             }
           },
           "description": "The request body at this endpoint is the transfer_msg JSON object.\n\nBoth `authsignature` and `usersignature` headers are required for this request."
+        }
+      }
+    },
+    "/redeem_sila": {
+      "post": {
+        "summary": "/redeem_sila",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Redemption process started OR Redemption process not started; see `message` attribute.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "ref submitted to ETH queue"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-redeem_sila",
+        "description": "Burns given amount of SILA at the handle's blockchain address and credits their named bank account in the equivalent monetary amount.\n\nThis is the reverse process of /issue_sila; tokens are removed from the handle's associated address, then the process of crediting the named bank account is started.\n\nIf the bank account cannot be credited (for instance, if the account has been closed), this operation will roll back and re-mint the tokens at the handle's address.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "usersignature",
+            "required": true,
+            "description": "The usersignature header should be generated with the keypair associated with the user"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/redeem_msg.v1.json"
+              },
+              "examples": {
+                "/redeem_sila example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "redeem_msg",
+                    "amount": 1000,
+                    "account_name": "default"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the redeem_msg JSON object.\n\nBoth authsignature and usersignature headers are required for this request."
         }
       }
     }

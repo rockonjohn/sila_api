@@ -679,7 +679,46 @@
       "post": {
         "summary": "/issue_sila",
         "tags": [],
-        "responses": {},
+        "responses": {
+          "200": {
+            "description": "Issuance process started OR Issuance process not started; see message attribute.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the header_message"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "`reference` submitted to ACH queue"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "message",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body format."
+          },
+          "401": {
+            "description": "`authsignature` or `usersignature` header was absent or incorrect."
+          }
+        },
         "operationId": "post-issue_sila",
         "description": "Debits a specified account and issues tokens to the address belonging to the requested handle.\n\nThe /issue_sila endpoint starts the debit of a user's linked bank account; once that transaction has officially settled, a process that takes about two business days to complete, the handle's blockchain address will be issued SILA tokens.\n\nSILA tokens are pegged to the value of $0.01 USD. To request the debit of $795.43, for instance, you would request \"amount\": 79543.\n\nKeep in mind that, especially because ACH (automated clearing house) transactions take such a long time to clear, results must be returned asynchronously. You can check the results of a transaction using the /get_transactions endpoint.",
         "parameters": [
@@ -700,7 +739,34 @@
             "name": "usersignature",
             "description": "The usersignature header should be generated with the keypair associated with the user"
           }
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/issue_msg.v1.json"
+              },
+              "examples": {
+                "/issue_sila example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "issue_msg",
+                    "amount": 1000,
+                    "account_name": "default"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the `issue_msg` JSON object.\n\nThe `amount` field is the amount of SILA tokens to issue, which is equivalent to a dollar amount x 100, or a number of cents. For example, to debit $1 from a user's account, you would request an amount of 100.\n\nThe `account_name` field is the name of the handle's linked account from which to debit the equivalent dollar amount.\n\nBoth `authsignature` and `usersignature` headers are required for this request."
+        }
       }
     }
   },

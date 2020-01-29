@@ -429,19 +429,24 @@
                       "enum": [
                         "SUCCESS",
                         "FAILURE"
-                      ]
+                      ],
+                      "description": "`SUCCESS` or `FAILURE`"
                     },
                     "reference": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the header_message"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Bank acount successfully linked OR Bank account not successfully linked"
                     },
                     "account_name": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "Account name provided in the request."
                     },
                     "match_score": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "0-1 weight of matching account holder name to KYCd user."
                     }
                   },
                   "required": [
@@ -465,6 +470,15 @@
                 }
               }
             }
+          },
+          "202": {
+            "description": "Bank account linked, but in a frozen state. Requires manual review - email support@silamoney.com for steps to unfreeze this bank account."
+          },
+          "400": {
+            "description": "Invalid request body format."
+          },
+          "401": {
+            "description": "`authsignature` or `usersignature` header was absent or incorrect."
           }
         },
         "operationId": "post-link_account",
@@ -508,6 +522,131 @@
           },
           "description": "The request body at this endpoint is the `link_account_msg` JSON object.\n\nThe `public_token` key is a required field and must have the public token returned in the onSuccess function of Plaid Link.\n\nThe `account_name` key is not required, but can be used to set a custom name to identify the linked checking account. If not provided, the linked account's name will be \"default\". We highly recommend specifying a custom name. Note: user handles cannot have two linked accounts with the same name.\n\nThe `selected_account_id` is not required; if provided, it should be an account ID in the array of selected accounts returned in the metadata object from Plaid Link. Currently, we do not link multiple accounts at once; you will need to send only one account ID. If no account ID is provided, we will link the first checking account we encounter from the array of accounts the customer has at their chosen bank.\n\nBoth authsignature and usersignature headers are required for this request."
         }
+      }
+    },
+    "/get_accounts": {
+      "post": {
+        "summary": "/get_accounts",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Successfully fetched array of accounts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account_number": {
+                      "type": "string"
+                    },
+                    "routing_number": {
+                      "type": "integer"
+                    },
+                    "account_name": {
+                      "type": "string"
+                    },
+                    "acount_type": {
+                      "type": "string",
+                      "enum": [
+                        "CHECKING"
+                      ]
+                    },
+                    "account_status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "inactive"
+                      ]
+                    },
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "account_link_status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "account_number",
+                    "routing_number",
+                    "account_name",
+                    "acount_type",
+                    "account_status",
+                    "active",
+                    "account_link_status"
+                  ]
+                },
+                "examples": {
+                  "/get_accounts response": {
+                    "value": [
+                      {
+                        "account_number": "*1234",
+                        "routing_number": "123456789",
+                        "account_name": "default",
+                        "account_type": "CHECKING",
+                        "account_status": "active",
+                        "active": "true/false",
+                        "account_link_status": "microdeposit_automatically_verified"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body format."
+          },
+          "401": {
+            "description": "`authsignature` or `usersignature` header was absent or incorrect."
+          }
+        },
+        "operationId": "post-get_accounts",
+        "description": "Gets basic bank account names linked to user handle.\n\nThis will return a list of account names, along with basic account information, linked to the requested user handle. These are the accounts that were linked using the /link_account endpoint.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/get_accounts_msg.v1.json"
+              },
+              "examples": {
+                "/get_accounts message": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "get_accounts_msg"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the get_accounts_msg JSON object.\n\nBoth authsignature and usersignature headers are required for this request."
+        }
+      }
+    },
+    "/issue_sila": {
+      "post": {
+        "summary": "/issue_sila",
+        "tags": [],
+        "responses": {},
+        "operationId": "post-issue_sila",
+        "description": "Debits a specified account and issues tokens to the address belonging to the requested handle.\n\nThe /issue_sila endpoint starts the debit of a user's linked bank account; once that transaction has officially settled, a process that takes about two business days to complete, the handle's blockchain address will be issued SILA tokens.\n\nSILA tokens are pegged to the value of $0.01 USD. To request the debit of $795.43, for instance, you would request \"amount\": 79543.\n\nKeep in mind that, especially because ACH (automated clearing house) transactions take such a long time to clear, results must be returned asynchronously. You can check the results of a transaction using the /get_transactions endpoint."
       }
     }
   },

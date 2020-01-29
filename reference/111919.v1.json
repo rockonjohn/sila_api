@@ -768,6 +768,103 @@
           "description": "The request body at this endpoint is the `issue_msg` JSON object.\n\nThe `amount` field is the amount of SILA tokens to issue, which is equivalent to a dollar amount x 100, or a number of cents. For example, to debit $1 from a user's account, you would request an amount of 100.\n\nThe `account_name` field is the name of the handle's linked account from which to debit the equivalent dollar amount.\n\nBoth `authsignature` and `usersignature` headers are required for this request."
         }
       }
+    },
+    "/transfer_sila": {
+      "post": {
+        "summary": "/transfer_sila",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Transfer process started OR Transfer process not started, see `message` attribute",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "reference": {
+                      "type": "string",
+                      "description": "`reference` in the response returns the `reference` provided by the customer in the entity_msg"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "ref submitted to ETH queue"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SUCCESS",
+                        "FAILURE"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "reference",
+                    "message",
+                    "status"
+                  ]
+                },
+                "examples": {
+                  "/transfer_sila response example": {
+                    "value": {
+                      "reference": "ref",
+                      "message": "ref submitted to ETH queue",
+                      "status": "SUCCESS"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post-transfer_sila",
+        "description": "Starts a transfer of the requested amount of SILA to the requested destination handle.\n\nThis request triggers a transfer of SILA tokens over the blockchain, going from the current authenticated user to the specified destination handle.\n\nIn theory, SILA tokens can be transferred from any blockchain address to any blockchain address. This endpoint assumes that the recipient has been registered with Sila and has a handle. Token transfers are restricted to whitelisted addresses (addresses which belong to KYC-verified users). After full launch, tokens will be transferable to any address.\n\nSince the Ethereum platform is currently the only platform we support (though we plan to support others), this will create one blockchain transaction. When other platforms are added, transfers from one platform to another will result in burning of tokens from an address on one platform to minting of tokens to an address on a different platform (two different blockchain transactions).",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "usersignature",
+            "description": "The usersignature header should be generated with the keypair associated with the user"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/transfer_msg.v1.json"
+              },
+              "examples": {
+                "/transfer_sila example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "transfer_msg",
+                    "amount": 13,
+                    "destination": "user2.silamoney.eth"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the transfer_msg JSON object.\n\nBoth `authsignature` and `usersignature` headers are required for this request."
+        }
+      }
     }
   },
   "components": {

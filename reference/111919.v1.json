@@ -950,6 +950,257 @@
           "description": "The request body at this endpoint is the redeem_msg JSON object.\n\nBoth authsignature and usersignature headers are required for this request."
         }
       }
+    },
+    "/get_transactions": {
+      "post": {
+        "summary": "/get_transactions",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "Able to return transaction information.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "returned_count": {
+                      "type": "integer"
+                    },
+                    "transactions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "user_handle": {
+                            "type": "string"
+                          },
+                          "reference_id": {
+                            "type": "string"
+                          },
+                          "transaction_id": {
+                            "type": "string"
+                          },
+                          "transaction_hash": {
+                            "type": "string"
+                          },
+                          "transaction_type": {
+                            "type": "string",
+                            "enum": [
+                              "issue",
+                              "transfer",
+                              "redeem"
+                            ]
+                          },
+                          "sila_amount": {
+                            "type": [
+                              "string",
+                              "integer"
+                            ]
+                          },
+                          "bank_account_name": {
+                            "type": "string"
+                          },
+                          "handle_address": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "usd_status": {
+                            "type": "string"
+                          },
+                          "token_status": {
+                            "type": "string"
+                          },
+                          "created": {
+                            "type": "string"
+                          },
+                          "last_update": {
+                            "type": "string"
+                          },
+                          "created_epoch": {
+                            "type": "integer"
+                          },
+                          "last_update_epoch": {
+                            "type": "integer"
+                          },
+                          "timeline": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "date": {
+                                  "type": "string"
+                                },
+                                "date_epoch": {
+                                  "type": "integer"
+                                },
+                                "status": {
+                                  "type": "string"
+                                },
+                                "usd_status": {
+                                  "type": "string"
+                                },
+                                "token_status": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "/get_transactions response example": {
+                    "value": {
+                      "success": true,
+                      "page": 1,
+                      "returned_count": 1,
+                      "total_count": 1,
+                      "transactions": [
+                        {
+                          "user_handle": "user.silamoney.eth",
+                          "reference_id": "ref",
+                          "transaction_id": "12345678-abcd-1234-abcd-1234567890ab",
+                          "transaction_hash": "0x1234567890abcdef1234567890abcdef",
+                          "transaction_type": "issue",
+                          "sila_amount": 1000,
+                          "bank_account_name": "default",
+                          "handle_address": "0x65a796a4bD3AaF6370791BefFb1A86EAcfdBc3C1",
+                          "status": "success",
+                          "usd_status": "success",
+                          "token_status": "success",
+                          "created": "2019-04-03T00:00:00.000Z",
+                          "last_update": "2019-04-03T00:00:00.003Z",
+                          "created_epoch": 1234567890,
+                          "last_update_epoch": 1234567899,
+                          "timeline": [
+                            {
+                              "date": "2019-04-03T00:00:00.000Z",
+                              "date_epoch": 1234567890,
+                              "status": "queued",
+                              "usd_status": "not started",
+                              "token_status": "not started"
+                            },
+                            {
+                              "date": "2019-04-03T00:00:00.001Z",
+                              "date_epoch": 1234567890,
+                              "status": "pending",
+                              "usd_status": "pending",
+                              "token_status": "not started"
+                            },
+                            {
+                              "date": "2019-04-03T00:00:00.002Z",
+                              "date_epoch": 1234567890,
+                              "status": "pending",
+                              "usd_status": "success",
+                              "token_status": "pending"
+                            },
+                            {
+                              "date": "2019-04-03T00:00:00.003Z",
+                              "date_epoch": 1234567899,
+                              "status": "success",
+                              "usd_status": "success",
+                              "token_status": "success"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request format."
+          },
+          "403": {
+            "description": "Bad/absent signature header."
+          },
+          "500": {
+            "description": "Server-side issue; let us know if you get this status code!"
+          }
+        },
+        "operationId": "post-get_transactions",
+        "description": "Gets array of user handle's transactions with detailed status information.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "authsignature",
+            "description": "Where many other API systems may require client IDs and secrets, Sila uses the [Elliptic Curve Digital Signature Algorithm (ECDSA)](https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm) to secure and validate requests.",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "header",
+            "name": "usersignature",
+            "description": "The usersignature header should be generated with the keypair associated with the user",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/get_transactions_msg.v1.json"
+              },
+              "examples": {
+                "/get_transactions example": {
+                  "value": {
+                    "header": {
+                      "created": 1234567890,
+                      "auth_handle": "handle.silamoney.eth",
+                      "user_handle": "user.silamoney.eth",
+                      "version": "0.2",
+                      "crypto": "ETH",
+                      "reference": "ref"
+                    },
+                    "message": "get_transactions_msg",
+                    "search_filters": {
+                      "transaction_id": "some UUID string assigned by Sila",
+                      "reference_id": "the reference string sent in the header object when transaction request was made",
+                      "show_timelines": true,
+                      "sort_ascending": false,
+                      "max_sila_amount": 1300,
+                      "min_sila_amount": 1000,
+                      "statuses": [
+                        "pending",
+                        "successful",
+                        "failed",
+                        "complete"
+                      ],
+                      "start_epoch": 1234567860,
+                      "end_epoch": 1234567891,
+                      "page": 1,
+                      "per_page": 20,
+                      "transaction_types": [
+                        "issue",
+                        "redeem",
+                        "transfer"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description": "The request body at this endpoint is the `get_transactions_msg` JSON object.\n\nThe `search_filters` object and all of its nested keys are optional. They can be used to filter the transactions that are returned.\n\nResults are paginated; by default, the first 20 results are returned in descending order of date transaction was started. You can request up to 100 results per page (\"`per_page`\": 100) and sort them in ascending order of date transaction was started (\"`sort_ascending`\": true) if desired.\n\nBoth `authsignature` and `usersignature` headers are required for this request."
+        }
+      }
     }
   },
   "components": {
